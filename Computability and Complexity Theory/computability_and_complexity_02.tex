@@ -1,0 +1,378 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+\def\plus{\text{+}}
+
+% Document starts here
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+\setlength\parindent{0pt}
+
+\section*{Question 1}
+
+\subsection*{Part a)}
+
+\textbf{Required:} Show that a language $B$ is Turing-recognizable if and only if $B \leq_m A_{TM}$. 
+
+\begin{proof}
+
+$(\Rightarrow):$ Assume $B$ is a Turing-recognizable language. Hence, there exists a TM $M$ that recognizes $B$. \\
+
+First we will define a mapping reduction $f$ from $B$ to $A_{TM}$. \\
+
+The mapping reduction $f$ will be defined based on the TM $F$ given below. \\
+
+$F = $ "On input $w$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. Output $\langle M, w \rangle$." \\
+
+\setlength\parindent{0pt}
+
+Hence, $f(w) = \langle M, w \rangle$, where $M$ is the TM that recognizes $B$. \\
+
+Clearly, $w \in B$ if and only if $\langle M, w \rangle \in A_{TM}$. \\
+
+Hence, $w \in B$ if and only if $f(w) \in A_{TM}$. Therefore, $B \leq_m A_{TM}$. \\
+
+$(\Leftarrow):$ Assume $B \leq_m A_{TM}$. Hence, there exists some computable function $f: \Sigma^* \rightarrow \Sigma^*$ such that for every $w \in \Sigma^*$, we have that $w \in B$ if and only if $f(w) \in A_{TM}$. \\
+
+We know from lecture and the textbook that $A_{TM}$ is recognizable. Let $M$ be the TM that recognizes $A_{TM}$. \\
+
+Consider the following $TM$ $M^\prime$ that recognizes $B$. \\
+
+$M^\prime = $ "On input $w$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. Compute $f(w)$. \\
+
+\indent 2. Run $M$ on input $f(w)$. If $M$ accepts $f(w)$, then accept. If $M$ rejects $f(w)$, then reject." \\
+
+\setlength\parindent{0pt}
+To show that $M^\prime$ recognizes $B$, consider the following. Since $f$ is a mapping reduction from $B$ to $A_{TM}$, we know $w \in B$ if and only if $f(w) \in A_{TM}$. \\
+
+If $w \in B$, then $f(w) \in A_{TM}$. So $M$ will accept $f(w)$, and hence $M^\prime$ will accept $w$. \\
+
+If $w \not \in B$, then $f(w) \not \in A_{TM}$. So $M$ will not accept $f(w)$, and hence $M^\prime$ will not accept $w$. Therefore, $M^\prime$ recognizes $B$. \\
+
+Since $M^\prime$ recognizes $B$, we have shown that $B$ is recognizable.
+\end{proof}
+
+\subsection*{Part b)}
+
+\textbf{Required:} Show that a language $A$ is decidable if and only if $A \leq_m 0^*1^*$ where $0^*1^*$ is the language containing strings of an arbitrary number of 0s, followed by an arbitrary number of 1s
+
+\begin{proof}
+($\Rightarrow$): Assume $A$ is decidable. Hence, there is a TM $M$ that decides $A$. Consider the following mapping reduction $f$ from $A$ to $0^*1^*$ that is given by the following TM $F$. \\
+
+$F = $ "On input $w$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. Run $M$ on $w$.  \\
+\indent 2. If $M$ accepts $w$, output $01$. If $M$ rejects $w$, output $10$." \\
+
+\setlength\parindent{0pt}
+Hence, $f: \Sigma^* \rightarrow \Sigma^*$ is the following function. 
+
+\[
+  f(w) =
+  \begin{cases}
+        01 & \text{if $M$ accepts $w$} \\
+        10 & \text{if $M$ rejects $w$} 
+  \end{cases}
+\]
+
+Notice, $01 \in 0^*1^*$ and $10 \not \in 0^*1^*$. Hence, trivially we get $w \in B$ if and only if $f(w) \in 0^*1^*$. So $f$ is a mapping reduction. Hence, $A \leq_m 0^*1^*$. \\
+
+($\Leftarrow$): Assume $A \leq_m 0^*1^*$. First we will show that $0^*1^*$ is decidable. Consider the following TM $M$ that decides $0^*1^*$. \\
+
+$M = $ "On input $w$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. Scan $w$. If a $1$ appears before a $0$, then reject. Otherwise, accept." \\
+
+\setlength\parindent{0pt}
+
+To show that $M$ decides $0^*1^*$, first consider $w \in 0^*1^*$. Hence, $w$ does not contain a 1 that appears before a 0. Hence, $M$ will accept. If $w \not \in 0^*1^*$, then $w$ must contain a 1 that appears before a 0. Hence, $M$ will reject. Hence, $M$ is indeed a decider for $0^*1^*$. \\
+
+Since $A \leq_m 0^*1^*$, we know there exists some computable function $f: \Sigma^* \rightarrow \Sigma^*$ such that for every $w \in \Sigma^*$, we have that $w \in A$ if and only if $f(w) \in 0^*1^*$. \\
+
+Consider the following $TM$ $M^\prime$ that decides $A$. \\
+
+$M^\prime = $ "On input $w$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. Compute $f(w)$. \\
+
+\indent 2. Run $M$ on input $f(w)$. If $M$ accepts $f(w)$, then accept. If $M$ rejects $f(w)$, then reject." \\
+
+\setlength\parindent{0pt}
+
+To see that $M^\prime$ decides $A$, consider the following. Since $f$ is a mapping reduction from $A$ to $0^*1^*$, we know that $w \in A$ if and only if $f(w) \in 0^*1^*$. So if $w \in A$, we have that $f(w) \in 0^*1^*$, and so $M$ accepts $f(w)$. Hence, $M^\prime$ will accept $w$. If $w \not \in A$, then $f(w) \not \in 0^*1^*$. Hence, $M$ rejects $f(w)$ since $M$ decides $0^*1^*$. Hence, $M^\prime$ will also reject $w$. This shows that $M^\prime$ is a decider for $A$. \\
+
+Therefore, $A$ is decidable. 
+\end{proof}
+
+\newpage
+
+\section*{Question 2}
+
+\subsection*{Part a)}
+
+\textbf{Required:} Let $A = \{\langle M \rangle : \text{$M$ is a TM and } |L(M)| = 5\}$. Is $A$ Turing recognizable? Is $A$ Turing co-recognizable. \\
+
+We will show that $A$ is neither Turing-recognizable nor Turing co-recognizable. \\
+
+First we will define a mapping reduction $f$ from $A_{TM}$ to $A$. \\
+
+The mapping reduction $f$ will be defined based on the TM $F$ given below. \\
+
+$F = $ "On input $\langle M, w \rangle$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. Construct the following TM $M_w$. Let $w_1,w_2,w_3,w_4$ be the first four distinct strings of $\Sigma^*$ that appear in standard string order that are also distinct from $w$. \\
+\indent \indent $M_w = $ 'On input $s$: \\
+\indent \indent \indent 1. If $s = w_i$ for $i \in \{1,2,3,4\}$, then accept. \\
+\indent \indent \indent 2. If $s = w$, then run $M$ on $w$ and output what $M$ outputs.' \\
+
+\indent 2. Output $\langle M_w \rangle$". \\
+
+\setlength\parindent{0pt}
+
+And if $F$ is given a string that is not an encoding of a TM $M$ and a string $w$, then output $\langle M_{reject} \rangle$ where $M_{reject}$ rejects every string so that $|L(M_{reject})| = 0$. \\
+
+Hence, 
+\[
+  f(x) =
+  \begin{cases}
+        \langle M_w \rangle & \text{if $x = \langle M, w \rangle$ for some TM $M$ and string $w$} \\
+        \langle M_{reject} \rangle & \text{otherwise} 
+  \end{cases}
+\]
+
+We have that $\langle M, w \rangle \in A_{TM}$ if and only if $f(\langle M, w \rangle) \in A$. \\
+
+So we have a mapping reduction $f$ from $A_{TM}$ to $A$. Hence, $A_{TM} \leq_m A$. \\
+
+Since $A_{TM} \leq_m A$, we also know that $\overline{A_{TM}} \leq_m \overline{A}$. Since we know that $\overline_{A_{TM}}$ is not recognizable from the textbook, we have that $\overline{A}$ is not recognizable. \\
+
+Since $\overline{A}$ is not recognizable, we have that $A$ is not co-recognizable. \\
+
+Next we will define a mapping reduction $g$ from $A_{TM}$ to $\overline{A}$. \\
+
+The mapping reduction $g$ will be defined based on the TM $G$ given below. \\
+
+$G = $ "On input $\langle M, w \rangle$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. Construct the following TM $M_w$. Let $w_1,w_2,w_3,w_4,w_5$ be the first five distinct strings of $\Sigma^*$ that appear in standard string order that are also distinct from $w$. \\
+\indent \indent $M_w = $ 'On input $s$: \\
+\indent \indent \indent 1. If $s = w_i$ for $i \in \{1,2,3,4,5\}$, then accept. \\
+\indent \indent \indent 2. If $s = w$, then run $M$ on $w$ and output what $M$ outputs.' \\
+
+\indent 2. Output $\langle M_w \rangle$". \\
+
+\setlength\parindent{0pt}
+
+And if $G$ is given a string that is not an encoding of a TM $M$ and a string $w$, then output $\langle M_5 \rangle$ where $M_5$ is the TM that accepts exactly the first 5 strings of $\Sigma^*$ in standard string order. \\
+
+Hence, 
+\[
+  g(x) =
+  \begin{cases}
+        \langle M_w \rangle & \text{if $x = \langle M, w \rangle$ for some TM $M$ and string $w$} \\
+        \langle M_5 \rangle & \text{otherwise} 
+  \end{cases}
+\]
+
+We have that $\langle M, w \rangle \in A_{TM}$ if and only if $f(\langle M, w \rangle) \in \overline{A}$. \\
+
+So we have a mapping reduction $g$ from $A_{TM}$ to $\overline{A}$. Hence, $A_{TM} \leq_m \overline{A}$. \\
+
+Since $A_{TM} \leq_m \overline{A}$, we also have $\overline{A_{TM}} \leq_m \overline{\overline{A}}$. Since $\overline{\overline{A}} = A$, we have that $\overline{A_{TM}} \leq_m A$. Since we know that $\overline_{A_{TM}}$ is not recognizable from the textbook, we have that $A$ is not recognizable. \\
+
+\textbf{Conclusion:} $A$ is not Turing-recognizable and $A$ is not Turing co-recognizable. 
+
+\subsection*{Part b)}
+
+\textbf{Required:} Let $B = \{\langle M \rangle : \text{$M$ is a TM and } |L(M)| \geq 5\}$. Is $A$ Turing recognizable? Is $A$ Turing co-recognizable. \\
+
+We will show that $B$ is Turing recognizable, but not Turing co-recognizable. \\
+
+\textbf{Def:} An ordering of strings is in Standard String Order (SSO) if they are first ordered by length, and strings of the same length are ordered by some alphabetical ordering. \\
+
+\textbf{Note:} Standard String Order (SSO) is also known as lexicographical ordering. In Tutorials, we used the term Standard String Order (SSO). \\
+
+First consider an enumeration of $\Sigma^*$ in Standard String Order (SSO). \\
+
+Consider the following TM $N$ that recognizes $B$. \\
+
+$N = $ "On input $\langle M \rangle$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. For each $w \in \Sigma^*$ in standard string order: simulate $M$ on $w$. If $M$ accepts $w$, keep track of this result. \\
+
+\indent 2. If $w$ has accepted 5 distinct strings $w$, then accept." \\
+
+\setlength\parindent{0pt}
+And if $N$ is given an input that is not an encoding of a TM $M$, then simply reject. \\
+
+To show that $N$ is a recognizer of $B$, let $x \in B$. Hence, $x = \langle M \rangle$ such that $|L(M)| \geq 5$. Hence, $N$ will simulate $M$ on $w$ for each $w \in \Sigma^*$ in standard string order. Since $|L(M)| \geq 5$, eventually $M$ will accept 5 strings, and hence $N$ will accept $x$. \\
+
+If $x \not \in B$ and $x$ is not an encoding of a TM, then $N$ will not accept $x$. If $x \not \in B$ and $x = \langle M \rangle$ for some TM $M$, then $M$ accepts at most 4 strings. Hence, $N$ will not accept $x$. \\
+
+Therefore, $N$ recognizes $B$. Therefore, $B$ is Turing-recognizable. \\
+
+Now we will show that $B$ is not Turing co-recognizable. In lecture we proved Rice's Theorem. \\
+
+\textbf{Rice's Theorem:} Suppose $P$ is a language of TM descriptions such that \\
+
+(i) $P$ is non-trivial: it contains some but not all TM descriptions. \\
+
+(ii) If $L(M_1) = L(M_2)$ for TMs $M_1$ and $M_2$, then $\langle M_1 \rangle \in P$ if and only if $\langle M_2 \rangle \in P$. \\
+
+Then $P$ is not decidable. \\
+
+Clearly $B$ is a language of TM descriptions. And clearly $B$ does not contain all TM descriptions. For instance $\langle M_{reject} \rangle \not \in B$ where $M_{reject}$ is the TM that rejects all strings since $|L(M_{reject})| = 0$. And clearly $B$ contains some TM descriptions. For instance, $\langle M_5 \rangle \in B$, where $M_5$ is the TM that accepts exactly the first 5 strings of $\Sigma^*$ in standard string order. \\
+
+And, if $L(M_1) = L(M_2)$ for TMs $M_1$ and $M_2$, then $|L(M_1)| = |L(M_2)|$. Hence, trivially we have $\langle M_1 \rangle \in B$ if and only if $\langle M_2 \rangle \in B$. \\
+
+Hence, $B$ is not decidable by Rice's Theorem. \\
+
+By Theorem 4.22 in the textbook, we know that a language is decidable if and only if it is recognizable and co-recognizable. \\
+
+Hence, a language is not decidable if and only if it is not recognizable or not co-recognizable. \\
+
+Since $B$ is not decidable, we know $B$ is not recognizable or $B$ is not co-recognizable. \\
+
+Since we have shown that $B$ is recognizable, we must have that $B$ is not co-recognizable. \\
+
+\textbf{Conclusion:} $B$ is Turing-recognizable, but $B$ is NOT Turing co-recognizable.
+
+\newpage
+
+\section*{Question 3}
+
+\textbf{Required:} Show that for every language $A$, there exists a language $B$ such that $B \not \leq_m A$. 
+
+\begin{proof}
+Assume for the sake of contradiction that there exists a language $A$ such that for every language $B$, we have that $B \leq_m A$. \\
+
+Let $\Sigma$ be the finite alphabet that we are working with. \\
+
+We know that every language is a subset of $\Sigma^*$ which is an infinite set. \\
+
+Let $\Sigma_{i}$ be the set of all strings that are of length $i \in \N$. Hence, $\Sigma^* = \bigcup_{i = 0}^\infty \Sigma_i$. Since each $\Sigma_i$ is finite, each $\Sigma_i$ is countable. Hence, $\Sigma^* = \bigcup_{i = 0}^\infty \Sigma_i$ is a countable union of countable sets. Hence, $\Sigma^*$ is countably infinite. \\
+
+Since $\Sigma^*$ is countably infinite, we know that its powerset, $\mathcal{P}(\Sigma^*)$ is uncountable. \\
+
+We also know from lecture that there are only countably many Turing machines. Since there are only countably many Turing machines, there are only countably many computable functions. \\
+
+We assumed every $B \in P(\Sigma^*)$ is such that $B \leq_m A$. Since there are uncountably many sets $B \in P(\Sigma^*)$, and there are only countably many computable functions, there must exist at least two distinct sets $B_1, B_2 \in P(\Sigma^*)$ such that $B_1 \neq B_2$ where the mapping reductions for $B_1 \leq_m A$ and $B_2 \leq_m A$ are given by the same computable function $f: \Sigma^* \rightarrow \Sigma^*$. \\
+
+Hence, for all $w \in \Sigma^*$, we have the following by definition of mapping reducibility for $B_1 \leq_m A$ and $B_2 \leq_m A$. 
+\begin{align}
+w \in B_1 \Leftrightarrow f(w) \in A
+\end{align}
+\begin{align}
+w \in B_2 \Leftrightarrow f(w) \in A
+\end{align}
+
+Since $B_1 \neq B_2$, there exists a string in one of these sets, but not the other. Without loss of generality, assume $s \in B_1$ but $s \not \in B_2$. \\
+
+Since $s \in B_1$, by (1) we get that $f(s) \in A$. \\
+
+Since $s \not \in B_2$, by (2) we get that $f(s) \not \in A$. \\
+
+Notice, $f(s) \in A$ and $f(s) \not \in A$ is a contradiction. Therefore, our initial assumption was wrong. \\
+
+Therefore, for every language $A$, there exists a language $B$ such that $B \not \leq_m A$. This completes the proof, as required. 
+\end{proof}
+
+\newpage
+
+\section*{Question 4}
+
+\textbf{Required:} A useless state in a Turing machine is one that is never entered on any input string. Consider the problem of determining whether a Turing machine has any useless states. Formulate this problem as a language and show that is it undecidable. 
+
+\begin{proof}
+Let $A = \{\langle M \rangle | \text{$M$ is a TM that has NO useless states}\}$ \\
+
+\textbf{NOTE:} The textbook defines every Turing machine $M$ to have an accept state $q_{accept}$ and a reject state $q_{reject}$ such that $q_{accept} \neq q_{reject}$. This is given on page 168, definition 3.3. 
+
+From the textbook we know that $HALT$ is undecidable, where $HALT$ is defined as follows. 
+
+$$HALT = \{\langle M, w \rangle : \text{$M$ is a TM and $M$ halts on $w$}\}$$
+
+We will show that $HALT \leq_m A$ by defining a mapping reduction $f$ given by the following TM $F$. \\
+
+$F = $ "On input $\langle M, w \rangle$: \\
+
+\setlength\parindent{15pt}
+
+\indent 1. Construct the following TM $M_w$ with no useless states except possibly $q_{accept}$. \\
+\indent \indent $M_w = $ 'On input $s$: \\
+\indent \indent \indent 1. If $s \neq w$, then reject. \\
+\indent \indent \indent 2. If $s = w$, run $M$ on $w$. If $M$ halts on $w$, then accept.' \\
+
+\indent 2. Output $\langle M_w \rangle$" \\
+
+\setlength\parindent{0pt}
+
+And if $F$ is given a string $x$ such that $x \neq \langle M, w \rangle$ for some TM $M$ and string $w$, then output $\langle M_{reject} \rangle$ where $M_{reject}$ is the TM that rejects all inputs (and hence $q_{accept}$ is useless). \\
+
+So $F$ determines the following computable function $f: \Sigma^* \rightarrow \Sigma^*$. 
+\[
+  f(x) =
+  \begin{cases}
+        \langle M_w \rangle & \text{if $x = \langle M, w \rangle$ for some TM $M$ and string $w$} \\
+        \langle M_{reject} \rangle & \text{otherwise} 
+  \end{cases}
+\]
+And $\langle M, w \rangle \in HALT$ if and only if $f(\langle M, w \rangle)$ has no useless states. \\
+
+Therefore, $\langle M, w \rangle \in HALT$ if and only if $f(\langle M, w \rangle) \in A$. \\
+
+Hence, $f$ is a mapping reduction from $HALT$ to $A$. i.e. $HALT \leq_m A$. \\
+
+We know $HALT$ and $\overline{HALT}$ are both undecidable from lecture and the textbook. Since $HALT \leq_m A$ and $HALT$ is undecidable, we have that $A$ is undecidable. Since $HALT \leq_m A$, we also have $\overline{HALT} \leq_m \overline{A}$. Since $\overline{HALT} \leq_m \overline{A}$ and $\overline{HALT}$ is undecidable, we also have that $\overline{A}$ is undecidable. \\
+
+Therefore, since $A$ and $\overline{A}$ are undecidable, we have shown that the problem of determining whether a TM has any useless states is undecidable. 
+\end{proof}
+
+
+
+
+
+
+
+
+
+
+\end{document} 
+
+
+
+
