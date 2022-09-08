@@ -14,7 +14,7 @@ Topics: Various algorithmic paradigms including divide-and-conquer, greedy algor
 
 ### Data Structures
 
-Topics: ADTS including graphs, dictionaries, priority queues, and disjoint sets. Data structures including BSTs, AVL trees, hashing, heaps, etc. Also includes some average-case and amortized complexity analysis and algorithms including Kruskal, Prim, DFS, BFS, etc.
+Topics: ADTs including graphs, dictionaries, priority queues, and disjoint sets. Data structures including BSTs, AVL trees, hashing, heaps, etc. Also includes some average-case and amortized complexity analysis and algorithms including Kruskal, Prim, DFS, BFS, etc.
 
 ### Textbook Sources
 
