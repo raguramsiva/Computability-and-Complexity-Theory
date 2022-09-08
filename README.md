@@ -1,4 +1,4 @@
-# Computability and Complexity Theory
+# Computability and Complexity Theory, Algorithms and Data Structures
 
 A repository of solutions to problems in Computability and Complexity Theory, Algorithms, and Data Structures.
 
