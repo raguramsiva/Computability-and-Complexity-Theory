@@ -1,0 +1,383 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{caption}
+\usepackage{graphicx}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+
+\captionsetup[algorithm]{labelformat=empty}
+
+% Document starts here
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+\setlength\parindent{0pt}
+
+\section*{Question 1}
+
+\subsection*{Part a)}
+
+\textbf{Required:} Prove a tight bound on the worst-case runtime complexity of an individual \verb|Insert| operation on a partially sorted array that contains $n$ integers. \\
+
+\textbf{Big-Oh Bound:} Consider a partially sorted array that contains $n$ integers. After appending a new item to the array, we increment \verb|size| by 1 so that $\verb|size| = n+1$. In the worst-case, this causes $\verb|size| \geq 2 \cdot \verb|sortedsize|$ leading us to execute \verb|insertionsort|. Since $n + 1 = \verb|size| \geq 2 \cdot \verb|sortedsize|$, we have that $\verb|sortedsize| \leq \lfloor \frac{n+1}{2} \rfloor$. And we know $\verb|sortedsize| \geq 0$. Hence, we have that $0 \leq i \leq \lfloor \frac{n+1}{2} \rfloor$ for line 2. Since we are considering an upper bound, we will consider $i = 0$, so that we have at most $\verb|size| - i = n + 1$ many iterations of the while loop on line 3. Note, we may have less iterations given that our array is partially sorted, but we are looking for an upper bound. For each such $i$ from 0 to $n$, we let $j = i$, and have at most $j=i$ many iterations of the while loop on line 5, and hence at most $j=i$ executions of line 6. \\
+
+In total we have at most $\sum_{i=0}^n i = \frac{n(n+1)}{2}$ executions of line 6. And recall we had appended 1 element to our array at the start. Hence, we have $\mathcal{O}(n^2)$ as an upper bound. \\
+
+\textbf{Omega Bound:} Consider a family of inputs, one for each $n \in \N$ as follows. For each $n \in \N$, let \verb|arr| contain $n$ integer elements such that $\verb|arr| = \Big[\lfloor \frac{n}{2} \rfloor-1, \lfloor \frac{n}{2} \rfloor,...,n-1,n, \lfloor \frac{n}{2} \rfloor-2,...,3,2,1 \Big]$ so that the first $\lfloor \frac{n}{2} \rfloor$ elements of \verb|arr| are sorted in nondecreasing order, and the remaining elements are sorted in nonincreasing order. \\
+
+Now assume we append the integer $0$ to \verb|arr|. We will increment \verb|size| so that $\verb|size| = n + 1$. Note, $\verb|sortedsize| = \lfloor \frac{n}{2} \rfloor$, so we get that $\verb|size| \geq 2 \cdot \verb|sortedsize|$. Hence, we execute \verb|insertionsort|. \\
+
+Since $\verb|arr[sortedsize:]|$ is nonincreasing with distinct elements, we have that $\verb|arr[sortedsize:]|$ is actually decreasing. Hence, for each $i$ from $i = \verb|sortedsize| = \lfloor \frac{n}{2} \rfloor$ to $i = \verb|size|-1 = n$, we will have at least $j=i$ many executions of the while loop on line 5, and hence at least $j = i$ many executions of line 6, since $\verb|arr[sortedsize:]|$ is strictly decreasing and each element must be moved to the leftmost part of the array during its iteration of the while loop of line 5. \\
+
+We have the following number of executions of line 6 when we sum up the above discussion. 
+\begin{align*}
+\sum_{i = \lfloor \frac{n}{2} \rfloor}^n i &= \sum_{i=0}^{n} i - \sum_{i=0}^{\lfloor \frac{n}{2} \rfloor - 1} i \\
+&= \frac{n(n+1)}{2} - \frac{\lfloor \frac{n}{2} \rfloor(\lfloor \frac{n}{2} \rfloor-1)}{2} \\
+&= \Omega(n^2)
+\end{align*}
+
+Hence, we have $\Omega(n^2)$ executions of line 6. We also have 1 step for appending an element $0$ to \verb|arr| at the start. Hence, we have a lower bound of $\Omega(n^2)$. Since we have $\mathcal{O}(n^2)$ and $\Omega(n^2)$, we conclude a tight bound of $\Theta(n^2)$. 
+
+\subsection*{Part b)}
+
+\textbf{Required:} Consider a sequence of $k$ insert operations performed on an initially empty partially sorted array. Use aggregate analysis to prove a tight bound on the amortized complexity per operation in this sequence. \\
+
+First we will show an upper bound on the worst case sequence complexity ($WCSC$) of $k$ insert operations. \\
+
+Let $t(i)$ be the number of steps taken for the $i$-th insert operation where $i \in \{1,...,k\}$. \\
+
+For inserts that do not call \verb|insertionsort|, we require only 1 step to append an item to our array. \\
+
+For inserts that do call \verb|insertionsort|, we require 1 step to append an item to our array and then $\mathcal{O}(i^2)$ many steps for \verb|insertionsort| after our $i$-th insert. This follows from our runtime analysis in part a). \\
+
+Since we only call \verb|insertionsort| when $\verb|size| \geq 2 \cdot \verb|sortedsize|$, we have that we call \verb|insertionsort| on inserts when $i$ is a power of 2. i.e. when $i = 2^j$ for some $j \geq 1$. \\
+
+Hence, we get the following for $t(i)$. 
+
+\[
+    t(i) \leq 
+    \begin{cases} 
+        1 + \mathcal{O}(i^2) &\text{if $i = 2^j$ for some $j \geq 1$} \\
+        1 &\text{otherwise}
+    \end{cases}
+\]
+
+Hence, we have
+
+\[
+    t(i) - 1 \leq 
+    \begin{cases} 
+        \mathcal{O}(i^2) &\text{if $i = 2^j$ for some $j \geq 1$} \\
+        0 &\text{otherwise}
+    \end{cases}
+\]
+
+Let $WCSC$ be the worst case sequence complexity for $k$ inserts. Please see the next page. \\
+
+\begin{align*}
+WCSC &\leq \sum_{i=1}^k t(i) \\
+&= k + \sum_{i=1}^k (t(i) - 1) \\
+&= k + \sum_{j=1}^{\lfloor \log(k) \rfloor} t(2^j) \\
+&= k + \sum_{j=1}^{\lfloor \log(k) \rfloor} \mathcal{O}((2^j)^2) \\
+&= k + \sum_{j=1}^{\lfloor \log(k) \rfloor} \mathcal{O}((2^2)^j) \\
+&= k + \sum_{j=1}^{\lfloor \log(k) \rfloor} \mathcal{O}(4^j) \\
+&= k + \frac{4}{3}\mathcal{O}(4^{\lfloor \log(k) \rfloor}-1) \\
+&= k + \frac{4}{3}\mathcal{O}(2^{2\lfloor \log(k) \rfloor}-1) \\
+&\leq k + \frac{4}{3}\mathcal{O}(2^{2\log(k)}-1) \\
+&= k + \frac{4}{3}\mathcal{O}(2^{\log(k^2)}-1) \\
+&= k + \frac{4}{3}\mathcal{O}(k^2-1) \\
+&= \mathcal{O}(k^2)
+\end{align*}
+
+So we have that $WCSC = \mathcal{O}(k^2)$. Now we will find a corresponding lower bound. \\
+
+Consider the following family of sequences of $k$ insert operations. Our sequence of $k$ inserts is $insert(k),insert(k-1),...,insert(2),insert(1)$ in that order. This sequence will cause the maximum amount of swaps (i.e. executions of line 6) during each call to \verb|insertionsort| on any $i$-th insert where $i = 2^j$ for some $j \geq 1$ since we are inserting in strictly decreasing order. And we know that we will have at least $\Omega(i^2)$ steps during these calls. \\
+ 
+Let $s(i)$ be the number of steps taken on the $i$-th insert of our sequence described above where $i \in \{1,...,k\}$. Hence, we have the following.
+\[
+    s(i) \geq 
+    \begin{cases} 
+        1 + \Omega(i^2) &\text{if $i = 2^j$ for some $j \geq 1$} \\
+        1 &\text{otherwise}
+    \end{cases}
+\]
+
+Hence, we have
+
+\[
+    s(i) - 1 \geq 
+    \begin{cases} 
+        \Omega(i^2) &\text{if $i = 2^j$ for some $j \geq 1$} \\
+        0 &\text{otherwise}
+    \end{cases}
+\]
+Hence,
+\begin{align*}
+WCSC &\geq \sum_{i=1}^k t(i) \\
+&= k + \sum_{i=1}^k (s(i) - 1) \\
+&= k + \sum_{j=1}^{\lfloor \log(k) \rfloor} s(2^j) \\
+&= k + \sum_{j=1}^{\lfloor \log(k) \rfloor} \Omega((2^j)^2) \\
+&= k + \sum_{j=1}^{\lfloor \log(k) \rfloor} \Omega((2^2)^j) \\
+&= k + \sum_{j=1}^{\lfloor \log(k) \rfloor} \Omega(4^j) \\
+&= k + \frac{4}{3}\Omega(4^{\lfloor \log(k) \rfloor}-1) \\
+&\geq k + \frac{4}{3}\Omega(4^{\log(k) - 1}-1) \\
+&= k + \frac{4}{3}\Omega(2^{2\log(k) - 2}-1) \\
+&= k + \frac{4}{3}\Omega(2^{\log(k^2) - 2}-1) \\
+&= k + \frac{4}{3}\Omega(\frac{1}{4}k^2-1) \\
+&= \Omega(k^2)
+\end{align*}
+
+Since $WCSC = \mathcal{O}(k^2)$ and $WCSC = \Omega(k^2)$, we get that $WCSC = \Theta(k^2)$. \\
+
+Hence, we get the following amortized complexity. 
+\begin{align*}
+amortized &= \frac{WCSC}{k} \\
+&= \frac{\Theta(k^2)}{k} \\
+&= \Theta(k)
+\end{align*}
+Therefore, the amortized complexity per operation in a sequence of $k$ insert operations is $\Theta(k)$, as required. 
+
+
+\newpage
+
+\section*{Question 2}
+
+\subsection*{Part a)}
+
+Consider the following counterexample. Let $\{s_1,s_2,s_3,s_4\}$ be our set of students. \\
+
+For each $i,j \in \{1,2,3,4\}$ such that $i \neq j$, let
+
+\[
+    f(s_i,s_j) = 
+    \begin{cases} 
+        0 &\text{if $i = 4$ or $j = 4$} \\
+        1 &\text{otherwise}
+    \end{cases}
+\]
+
+Let $T_0,T_1$ be any valid partitioning of our set of students into 2 teams. Hence, we know $T_0 \cup T_1 = \{s_1,s_2,s_3,s_4\}$ and $T_1 \cap T_2 = \emptyset$ and $T_0, T_1 \neq \emptyset$. \\
+
+Since $T_0, T_1 \neq \emptyset$, we must be in one of the following two cases. \\
+
+\textbf{Case 1:} $|T_0| = |T_1| = 2$. \\
+
+Without loss of generality, assume $T_0 = \{s_x,s_y\}$ and $T_1 = \{s_z, s_4\}$ where $x,y,z \in \{1,2,3\}$. \\
+
+Let $j = 1$, and let $s_i = s_z \in T_1 = T_j$. Let $s_{i^\prime} \in T_j - \{s_i\}$ be arbitrary. Note, we must have that $s_{i^\prime} = s_4$. \\
+
+Let $s_k = s_1 \in T_0 = T_{j-1}$. We have that $f(s_i, s_{i^\prime}) = f(s_z,s_4) = 0 < 1 = f(s_z,s_1) = f(s_i,s_k)$. \\
+
+So $f(s_i, s_{i^\prime}) < f(s_i,s_k)$. \\
+
+So the negation of property $(*)$ holds. \\
+
+Therefore, property $(*)$ does not hold. \\
+
+\textbf{Case 2:} One of $T_0,T_1$ has cardinality 1, and the other has cardinality 3. \\
+
+Without loss of generality, assume $|T_0| = 1$ and $|T_1| = 3$. \\
+
+Assume for the sake of contradiction that  $(*)$ holds. \\
+
+So let $j = 0$ and let $s_i \in T_0 = T_j$. Hence, there exists an $s_{i^\prime} \in T_j - \{s_i\} = \emptyset$. This is a contradiction as the empty set contains no elements. \\
+
+Hence, property $(*)$ cannot hold. \\
+
+In either case, we have that $(*)$ does not hold for our example of students, as required. \\
+
+Please see the next page. 
+
+\newpage
+
+
+\subsection*{Part b)}
+
+We will use the graph ADT. We will also use the union by rank with path compression implementation of the Disjoint Set ADT, along with Kruskal's algorithm. \\
+
+Consider the following weighted undirected graph $G = (V, E)$. \\
+
+Let $V = \{s_1,...,s_n\}$ and $E = \{\{s_i,s_j\}: s_i, s_j \in V \land s_i \neq s_j\}$. For each $\{s_i,s_j\} \in E$, let $w(\{s_i,s_j\}) = f(s_i,s_j)$ where $w$ is our weight function and $f$ is our friendship scoring. \\
+
+We will sort our edges by non-increasing weights in order to apply Kruskal's algorithm. Note that this application of Kruskal's algorithm will consider the most costly edges first. i.e. Kruskal's algorithm will look for a maximum spanning tree. \\
+
+Consider the following algorithm below. 
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{TeamFinder($\{s_1,...,s_n\}$)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\State $V \gets \{s_1,...,s_n\}$
+\State $E \gets \{\{s_i,s_j\}: s_i, s_j \in V \land s_i \neq s_j\}$
+\For{each $\{s_i,s_j\} \in E$}
+    \State $w(\{s_i,s_j\}) \gets f(s_i,s_j)$
+\EndFor
+\State
+\State $G \gets (V,E)$ \Comment{$G$ is a connected, undirected, weighted graph}
+\State Sort edges of $E$ by weight in non-increasing order. 
+\State Run Kruskal's algorithm to find a maximum spanning tree $T$. Also keep track of the last edge $e_0 \in E$ added to $T$. 
+\State
+\State $A \gets$ the set of vertices belonging to edges in $T$. \Comment{Note, $A = V = \{s_1,...,s_n\}$}
+\State
+\State $T^\prime \gets T \setminus \{e_0\}$ 
+\State $B \gets $ the set of vertices belonging to edges in $T^\prime$
+\State
+\State $T_0 \gets B$ \Comment{Note, $|T_2| = n-1$}
+\State $T_1 \gets A \setminus B$ \Comment{Note, $|T_1| = 1$}
+\State
+\State \textbf{return} $T_0$ and $T_1$
+\end{algorithmic}
+\end{algorithm}
+
+Please see the next page. 
+
+\newpage
+
+\section*{Part c)}
+
+We will now explain the correctness of our algorithm. \\
+
+
+Lines 1-7 simply constructs a connected, undirected, weighted graph $G = (V,E)$, where $V$ is our set of students, and $E$ is the set of all unordered pairs of students. And the weights of each edge are the friendship scores of that pair of students. \\
+
+We sort $E$ by non-increasing weights (i.e. non-increasing friendship scores), and then run Kruskal's algorithm to find a maximum spanning tree $T$. \\
+
+We also keep track of the last edge $e_0$ added to $T$. We let $A$ be the set of all vertices of edges belonging to $T$. Since $T$ is a maximum spanning tree, we know that $A = V$. \\
+
+We then let $B$ be the set of all vertices belonging to edges in $T^\prime = T \setminus \{e_0\}$. \\
+
+Since $T$ was a maximum spanning tree, we know that $B$ contains every vertex of $A = V$, except one vertex which was part of $e_0$. \\
+
+We then let $T_0 = B$, and $T_1 = A \setminus B$. Hence, we have $|T_0| = n-1$ and $|T_1| = 1$. \\
+
+\textbf{Want to Show:} $T_0$ and $T_1$ satisfy our modified property $(*)$. \\
+
+W know that $|T_1| = 1$. Hence, ii) of $(*)$ trivially holds for $T_j = T_1$. \\
+
+Now consider $T_j = T_0$. Let $s_i \in T_j = T_0$. We will show that i) holds. \\
+
+Let $s_{i^\prime}$ be the vertex such that $\{s_i, s_{i^\prime}\}$ is the first edge added to $T$ in our algorithm that includes $s_i$. \\
+
+Let $s_k \in T_{1-j} = T_1$. Since $|T_1| = 1$, we have that $T_0 = \{s_k\}$. Consider our tree $T$ prior to adding the edge $\{s_i, s_{i^\prime}\}$. \\
+
+Since $s_k \in T_1$ was the last vertex to be reached from our maximum spanning tree, we know that $s_k$ was not part of any edge in $T$ prior to adding the edge $\{s_i, s_{i^\prime}\}$. \\
+
+Hence, $s_k$ and $s_i$ were not part of any edge of $T$ prior to adding the edge $\{s_i, s_{i^\prime}\}$. Hence, Kruskal's algorithm had the option of choosing to add the edge $\{s_i, s_k\}$ instead of $\{s_i, s_{i^\prime}\}$ without creating any cycles. The only reason Kruskal chose $\{s_i, s_{i^\prime}\}$ instead of $\{s_i, s_k\}$ must be that $w(\{s_i, s_{i^\prime}\}) \geq w(\{s_i,s_k\})$. \\
+
+Since our weights equal their corresponding friendship scores, we have $f(s_i, s_{i^\prime}) \geq f(s_i,s_k)$. Hence, i) holds. Therefore, the modified $(*)$ property holds for $T_0$ and $T_1$ given by our algorithm. Therefore, our algorithm is correct, as required. 
+
+
+\section*{Part d)}
+
+\textbf{Required:} Explain why the worst-case runtime of our algorithm is $\mathcal{O}(n^2 \log n)$. \\
+
+Note, since $G$ considers all (unordered) pairs of vertices as edges, we have that $|E| = \binom{|V|}{2} = \frac{|V|(|V|-1)}{2}$. \\
+
+We know that constructing $G$ takes $\mathcal{O}(|V| + |E|) = \mathcal{O}(|V|^2)$ time using an adjacency list and given the fact that $|E| = \binom{|V|}{2} = \frac{|V|(|V|-1)}{2}$. \\
+
+And sorting the edges of $G$ by weight in non-increasing order (using say mergesort) takes $\mathcal{O}(|E| \log|E|)$ time. And Kruskal's algorithm also takes $\mathcal{O}(|E| \log|E|)$ time. \\
+
+Note, $\mathcal{O}(|E| \log|E|) = \mathcal{O}(|V|^2\log(|V|^2)) = \mathcal{O}(2|V|^2\log|V|) = \mathcal{O}(|V|^2\log|V|)$ time. \\
+
+Determining the sets $A,B,T^\prime,T_0,T_1$ all take at most $\mathcal{O}(|E|) = \mathcal{O}(|V|^2)$ time. \\
+
+Hence, the overall runtime is $\mathcal{O}(|V|^2\log|V|)$. \\
+
+Since $|V| = |\{s_1,...,s_n\}| = n$, we have that the overall runtime is $\mathcal{O}(n^2 \log n)$, as required. 
+
+\newpage
+
+\section*{Question 3}
+
+\subsection*{Part a)}
+
+We will use the graph ADT. In particular, we will use a directed graph. Depending on the instance of our problem, our directed graph may or may not be cyclic. In fact, testing for cycles will be part of our algorithm in part b). \\
+
+Let $\mathcal{B}$ be a set of observations. \\
+
+Let $V = \{R_1,...,R_n\}$ be our set of vertices. Let $E$ be our set of edges defined below. \\
+
+For each $R_i \rightarrow R_j \in \mathcal{B}$ where $i < j$, we have an edge $(R_i, R_j) \in E$ and edges $(R_i, R_k) \in  E$ for each $k$ such that $j < k \leq n$. Note, $R_i \rightarrow R_j \in \mathcal{B}$ implies that $R_i$ finishes before $R_j$ begins, and hence we have that $R_i$ finishes before $R_k$ begins for each $k$ such that $j < k \leq n$ since each runner starts strictly before the next runner in our sequence of runners. \\
+
+For each $R_i \sim R_j \in \mathcal{B}$ where $i < j$, we have an edge $(R_j,R_i) \in E$. \\
+
+Let $G = (V,E)$ be our directed graph which we will use to implement our algorithms in parts b) and c). 
+
+\subsection*{Part b)}
+
+Consider the following algorithm. 
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{CheckConsistency($\mathcal{B}$)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\State Construct the graph $G = (V,E)$ as described in part a). 
+\State Run DFS (depth first search) on $G$ and construct the DFS tree $T$.
+\For{each edge $e \in E$}
+    \If{$e$ is a back edge with respect to the DFS tree $T$}
+        \State \textbf{return} "INCONSISTENT" \Comment{We have a cycle}
+    \EndIf
+\EndFor
+\State \textbf{return} "CONSISTENT" \Comment{We have no cycles}
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Explanation of Correctness:} We know that a given $\mathcal{B}$ is inconsistent if there exists some $R_i \rightarrow R_j \in \mathcal{B}$ such that there exists some $k \geq j$ such that $R_i \sim R_k \in \mathcal{B}$. But then by our construction of $G$, we would then have a cycle $\{(R_i,R_k), (R_k, R_i)\} \subseteq E$. And hence our algorithm will return "INCONSISTENT" as we have a back edge. Note, this fact that a cyclic directed graph has a cycle if and only if there is a back edge in its depth first search tree was discussed in lecture in Week 9 regarding topological sorting. If no such inconsistency exists, then $G$ will have no such cycle. And hence we will return "CONSISTENT". Hence, our algorithm is correct. \\
+
+Note, in effect our algorithm relies on the key ideas of topological sorting. However, we decided to explicitly write our algorithm in terms of back edges, as opposed to explicitly using topological sort since there may not be a topological sorting if our graph $G$ has cycles. \\
+
+\textbf{Explanation of Runtime:} Our algorithm is dominated by the depth first search. Hence, our algorithm takes as long as the depth first search which we know is $\mathcal{O}(n+m)$, where $n = \mathcal{O}(|V|)$ and $m = \mathcal{O}(|E|)$, as required. 
+
+\subsection*{Part c)}
+
+Consider the following algorithm. Note, we will assume as a precondition that $\mathcal{B}$ is consistent. Hence, our graph $G$ as described in part a) will not have any cycles. 
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{PotentialWinners($\mathcal{B}$)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\If{$\mathcal{B}$ only contains observations of the form $R_i \sim R_j$}
+    \State \textbf{return} $\{R_1,R_2,...,R_n\}$
+\EndIf
+\State Construct the graph $G = (V,E)$ as described in part a). 
+\State Run DFS (depth first search) on $G$ and construct the DFS tree $T$.
+\State Let $\pi[v]$ be the parent of each vertex $v \in V$ in our DFS tree $T$. Note, $\pi[v]$ is Null if $v$ has no parent node in $T$. 
+\State 
+\State $losers \gets \{ \}$
+\For{each vertex $v \in V$}
+    \If{$\pi[v]$ is not Null in our DFS tree $T$}
+        \State Add $v$ to $losers$
+    \EndIf
+\EndFor
+\State
+\State $potential \gets \{R_1,R_2,...,R_n\} \setminus losers$
+\State \textbf{return} $potential$
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Explanation of Correctness:} If $\mathcal{B}$ only contains observations of the form $R_i \sim R_j$, then every runner can potentially win, and hence our algorithm correctly returns $\{R_1,R_2,...,R_n\}$. Otherwise, our algorithm runs DFS and then considers each vertex $v \in V$. If $\pi[v]$ is not Null, where $\pi$ indicates parenthood in the DFS tree $T$, then we know that $v$ cannot possibly win based on the construction of our graph $G$. i.e. Assume $v = R_j$ for some $j \in \{1,...,n\}$ and $\pi[v]$ is not Null. Then in our graph we must have some $R_i$ such that $(R_i,R_j) \in E$. Hence, we have some $R_i \rightarrow R_j \in \mathcal{B}$, and hence $R_j$ cannot win as $R_i$ finishes before $R_j$ even begins. So $R_j$ is a loser. Our algorithm then adds all such losers to the set $losers$. Finally, we return $potential = \{R_1,...,R_n\} \setminus losers$ which are all the potential winners. \\
+
+\textbf{Explanation of Runtime:} Our algorithm is dominated by the depth first search. Hence, our algorithm takes as long as the depth first search which we know is $\mathcal{O}(n+m)$, where $n = \mathcal{O}(|V|)$ and $m = \mathcal{O}(|E|)$, as required. 
+
+
+
+
+
+
+
+
+\end{document} 

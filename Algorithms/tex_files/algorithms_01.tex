@@ -1,0 +1,513 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{caption}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+
+
+\captionsetup[algorithm]{labelformat=empty}
+
+\begin{document}
+
+\setlength\parindent{0pt}
+
+\section*{Question 1}
+
+\subsection*{Part a)}
+
+Consider the following algorithm DecideCandidate($L$) where $L$ is a list of the $n$ names that we are considering. \\
+
+\textbf{Note:} The following algorithm is written in pseudocode with some Python-like syntax. 
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{DecideCandidate($L$)}}\label{alg:cap}
+\begin{algorithmic}[1]
+\State $n \gets length(L)$ \Comment{Note, $L$ is a list of names}
+\If{$n \leq 1$}
+    \State \textbf{return} $L$
+\EndIf
+\State
+\State $mid \gets \lfloor \frac{n}{2} \rfloor$
+\State $left \gets DecideCandidate(L[0,...,mid])$ \Comment{Note, indices in lists are inclusive, 0-based}
+\State $right \gets DecideCandidate(L[mid+1,...,n-1])$ \Comment{List slicing takes constant time}
+\State
+\State $potential \gets left$ 
+\For{$name$ in $right$}
+    \State \textbf{if} $name$ not in $potential$ \textbf{then} $potential.append(name)$
+\EndFor
+\State
+\State $candidates \gets $ [ ] \Comment{Initialize empty list}
+\For{$name1$ in $potential$}
+    \State $count \gets 0$
+    \For{$name2$ in $L$}
+        \State \textbf{if} $name1 = name2$ \textbf{then} $count \gets count + 1$
+    \EndFor
+    \State \textbf{if} $count > \lfloor \frac{n}{3} \rfloor$ \textbf{then} $candidates.append(name1)$
+\EndFor
+\State
+\State \textbf{return $candidates$}
+\end{algorithmic}
+\end{algorithm}
+
+
+\subsection*{Part b)}
+
+Let $T(n)$ be the worst-case running time of DecideCandidate($L$) where $L$ is a list of the $n$ names. \\
+
+WLOG, assume $n$ is a power of 2. \\
+
+Steps 1-4 is our base case takes $\mathcal{O}(1)$ time if $n = len(L) \leq 1$.
+
+If $n > 1$, then we make two recursive calls with runtime $T(\frac{n}{2})$. So we have $2T(\frac{n}{2})$ in lines 6-8. \\
+
+For the combine step, Lines 11-13 take $\mathcal{O}(1)$ time since $right$ and $left$ each has at most 2 elements and hence this for loop takes constant time. Furthermore, since each of $left$ and $right$ have at most 2 elements each, we have that $potential$ has at most 4 elements. Hence, lines 15-22 will only take $\mathcal{O}(n)$ time as the outer loop only has 4 iterations, whereas the inner loop takes $\mathcal{O}(n)$ iterations. The body of each of the for loops takes only $\mathcal{O}(1)$ time. Hence, lines 15-22 indeed takes $\mathcal{O}(n)$ time. \\
+
+Therefore, the non-recursive part takes $\mathcal{O}(n)$ time. \\
+
+Hence, we get the following recursive relation which ignores floors as we assume $n$ is a power of 2. \\
+
+\[
+  T(n) \leq
+  \begin{cases}
+        \mathcal{O}(1) & \text{if $n \leq 1$} \\
+        2T(\frac{n}{2}) + \mathcal{O}(n) & \text{if $n > 1$} 
+  \end{cases}
+\]
+
+Now we will apply the Master Theorem. Looking at the above recurrence relation we have that $a = 2$, $b = 2$, $f(n) = n$. Hence, $\log_ba = \log_22 = 1$. Let $k = 0$. We have that $f(n) = \Theta(n) = \Theta(n^{\log_ba}\log^kn)$. Hence, by Case 2 of the Master Theorem, we get that $T(n) = \mathcal{O}(n^{\log_ba}\log^{k+1}n) = \mathcal{O}(n\log n)$. \\
+
+Therefore, $T(n) = \mathcal{O}(n\log n)$ as required. 
+
+\subsection*{Part c)}
+
+We will prove the correctness of DecideCandidate($L$). Let $n = len(L)$. \\
+
+Let $P(n)$ be the predicate "DecideCandidate($L$) is correct on inputs of size $n$". \\
+
+\textbf{Show:} $\forall n \in \N, P(n)$. 
+
+\begin{proof}
+\\
+\textbf{Base Cases:} For $n = 0$, we have that $L = []$ is an empty list of names. Every name in $L$ trivially appears more than $\frac{n}{3}$ times. Hence, DecideCandidate($L$) correctly returns $L$. So $P(0)$ holds. \\
+
+For $n = 1$, we have that $L$ contains exactly 1 name. This name appears one time which is more than $\frac{n}{3} = \frac{1}{3}$. Hence, DecideCandidate($L$) correctly returns $L$. So $P(1)$ holds. \\
+
+\textbf{Inductive Hypothesis:} Assume $P(i)$ holds for all $0 \leq i < n$ where $n \in \N$ such that $n > 1$. \\
+
+\textbf{Want to Show:} $P(n)$ holds. \\
+
+WLOG, assume $n$ is a power of 2. Since $n > 1$, we have two recursive calls on $left = DecideCandidate(L[0,...,mid])$ and $right = DecideCandidate(L[mid+1,...,n-1])$ where $mid = \frac{n}{2}$. Since $P(\frac{n}{2})$ holds by inductive hypothesis, we have that $left$ and $right$ correctly return the names that appear more than $\frac{len(left)}{3} = \frac{n}{6}$ times and $\frac{len(right)}{3} = \frac{n}{6}$ times respectively within each sublist. \\
+
+Note that for any name in $L$ that appears more than $\frac{n}{3}$ times, we have that this name must appear more than $\frac{n}{6}$ times in at least one of $left$ or $right$. Hence, any name that must be correctly returned from DecideCandidate($L$) must be part of $left$ or $right$. \\
+
+Lines 10-13 combines $left$ and $right$ into $potential$ without any possible duplicates. \\
+
+Each of $left$ and $right$ has at most 2 elements each by inductive hypothesis. Hence, $potential$ has at most 4 elements. And lines 15-22 finds the elements of $potential$ that appear more than $\frac{n}{3}$ times in $L$ and appends those names in the list $candidates$. And we return $candidates$ which correctly contains all the required names. Hence, $P(n)$ holds. \\
+
+Therefore, by induction we have that $\forall n \in \N, P(n)$ holds. Therefore, DecideCandidate($L$) is correct, as required. 
+\end{proof}
+
+
+\newpage
+
+\section*{Question 2}
+
+\subsection*{Part a)}
+
+On Piazza, the instructor indicated that we can assume that the treasure parameters of the form $(x_i,y_i)$ can be part of a list. \\
+
+So assume that $L$ is a list of treasure parameters where each element is of the form $(x_i,y_i)$ where $x_i$ and $y_i$ are the parameters 'easiness' and 'value' respectively. And we will assume that any two treasures will differ in at least one of their parameters. \\
+
+Before we define our divide and conquer algorithm, we will do a global sorting of $L$ in non-decreasing order by $x$ coordinate, and if two treasures have the same $x$ coordinate, then we continue to order in non-decreasing order by $y$ coordinate. This is a form of lexicographic ordering or standard-string-ordering. \\
+
+\textbf{Note:} The following algorithm is written in pseudocode with some Python-like syntax. 
+\begin{algorithm}[hbt!]
+\caption{\textbf{ValuableTreasures(L)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\State Sort $L$ via mergesort in non-decreasing order by $x$ coordinate, and if two treasures have the same $x$ coordinate, then we continue to order in non-decreasing order by $y$ coordinate.
+\State \textbf{return} $Valuable(L)$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{Valuable(L)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\State $n \gets len(L)$ \Comment{Assume distinct treasures differ in at least one parameter}
+\If{$n \leq 1$}
+    \State \textbf{return} $L$
+\EndIf
+\State \Comment{List slicing takes constant time}
+\State $mid \gets \lfloor \frac{n}{2} \rfloor$ \Comment{Note, list indices are inclusive, 0-based}
+\State $left \gets Valuable(L[0,...,mid])$ \Comment{Note, $left$ is in our lexicographical order}
+\State $right \gets Valuable(L[mid + 1,...,n-1])$ \Comment{Note, $right$ is in our lexicographical order}
+\State
+\State Let $smallest\_right \gets right[0]$. Write $smallest\_right = (x_j, y_j)$ for convenience.
+\State $new\_left \gets $ [ ]
+\For{each $(x_i, y_i)$ in $left$}
+    \If{\textbf{not} ($x_j \geq x_i$ and $y_j \geq y_i$)}
+        \State $new\_left.append((x_i, y_i)$)
+    \EndIf
+\EndFor
+\State
+\State \textbf{return $new\_left + right$} \Comment{List concatenation}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Part b)}
+
+Let $n = len(L)$. Let $T(n)$ be the worst-case running time of ValuableTreasures($L$). \\
+
+We know Step 1 takes $\mathcal{O}(n\log n)$ since we are doing a global mergesort. And Step 2 is our divide and conquer algorithm. In Step 2 we make a call to Valuable($L$). Let $S(n)$ be the worst-case running time of Valuable($L$). \\
+
+The base case of Valuable in lines 1-4 takes $\mathcal{O}(1)$ time when $n = len(L) \leq 1$. If $n > 1$, we have two recursive calls of length approximately $\frac{n}{2}$ in lines 6-8. WLOG, assume $n$ is a power of 2. Hence, we have $2S(\frac{n}{2})$. Lines 10-11 takes constant time since it is just accessing the first element of $right$ and declaring a new empty list. For the combine step, we have a for loop on lines 12-16 that has at most $\frac{n}{2}$ iterations. And the body of this loop takes constant steps. Hence, this for loop takes $\mathcal{O}(n)$ time. The final list concatenation on line 18 also takes $\mathcal{O}(n)$ time. Hence, the combine step takes $\mathcal{O}(n)$ time. Hence, consider the following recurrence for $S(n)$ which ignores floors as we assume $n$ is a power of 2. 
+
+\[
+  S(n) \leq
+  \begin{cases}
+        \mathcal{O}(1) & \text{if $n \leq 1$} \\
+        2S(\frac{n}{2}) + \mathcal{O}(n) & \text{if $n > 1$} 
+  \end{cases}
+\]
+
+Now we will apply the Master Theorem. Looking at the above recurrence relation we have that $a = 2$, $b = 2$, $f(n) = n$. Hence, $\log_ba = \log_22 = 1$. Let $k = 0$. We have that $f(n) = \Theta(n) = \Theta(n^{\log_ba}\log^kn)$. Hence, by Case 2 of the Master Theorem, we get that $S(n) = \mathcal{O}(n^{\log_ba}\log^{k+1}n) = \mathcal{O}(n\log n)$. \\
+
+Therefore, $S(n) = \mathcal{O}(n\log n)$ as required. \\
+
+Hence, we have that $T(n) = \mathcal{O}(n\log n) + \mathcal{O}(n\log n) = \mathcal{O}(n\log n)$ when taking into account the mergesort. \\
+
+Therefore, the runtime of our algorithm ValuableTreasures($L$) is $\mathcal{O}(n\log n)$. 
+
+\subsection*{c)}
+
+We will prove the correctness of ValuableTreasures($L$). Step 1 is just a preprocessing step that does a global mergesort in lexicographical order. Hence, we just need to prove the correctness of Valuable($L$). \\
+
+Assume any of our lists $L$ are sorted in our defined lexicographical order by the mergesort. \\
+
+Let $n = len(L)$. Let $P(n)$ be the predicate "Valuable($L$) is correct on inputs of size $n$". \\
+
+\textbf{Show:} $\forall n \in \N, P(n)$.
+
+\begin{proof}
+\textbf{Base Cases:} For $n = 0$, we have that $L$ is empty. Hence, trivially we correctly return $L$. For $n = 1$, we have that $L$ has a single treasure. Hence, this single treasure is valuable by definition. Hence, we correctly return $L$. So $P(0)$ and $P(1)$ hold. \\
+
+
+\textbf{Inductive Hypothesis:} Assume $P(i)$ holds for all $0 \leq i < n$ where $n \in \N$ such that $n > 1$. \\
+
+\textbf{Want to Show:} $P(n)$ holds. \\
+
+WLOG, assume $n$ is a power of 2. Hence, we have $mid = \frac{n}{2}$. Since $P(\frac{n}{2})$ holds by the inductive hypothesis, we have that $left$ and $right$ are the valuable treasures from $L[0,...,mid]$ and $L[mid + 1,...,n-1]$ respectively. \\
+
+Note, every treasure in $right$ must also be valuable with respect to $L$ given our lexicographical ordering. Hence, the only possible treasures that may not be valuable with respect to $L$ are contained in $left$. \\
+
+We have that $smallest\_right = (x_j,y_j)$ is the first element of the list $right$ which is in our lexicographical ordering. Hence $(x_j,y_j)$ is the treasure with the smallest $x$-coordinate in $right$. Since this treasure is valuable, it must be the case that $y_j$ is the maximum $y$-coordinate in $right$. If $y_j$ were not the maximum $y$-coordinate in $right$, we would be able to find a pair $(x_k, y_k)$ in right such that $x_k \geq x_j$ and $y_k > y_j$ which would imply that the treasure with parameters $(x_j,y_j)$ is not valuable in $right$, a contradiction. \\
+
+Every treasure $(x_i,y_i)$ in $left$ is such that $x_i \leq x_j$. Since $y_j$ is the maximum $y$-coordinate in $right$, it is sufficient to simply compare each $(x_i,y_i)$ in $left$ with $(x_j,y_j)$ to check if $(x_i,y_i)$ is not valuable with respect to $L$. Comparing $(x_i,y_i)$ with any other treasure in $right$ is redundant as any other treasure in right has $y$ coordinate smaller than $y_j$. Treasures $(x_i,y_i)$ in $left$ that are not valuable with respect to $L$ are not appended to $new\_left$ in our for loop in lines 12-16. All other treasures in $left$ are appended to $new\_left$. \\
+
+Finally we return $new\_left + right$ which concatenates $new\_left$ and $right$ which correctly contain all the valuable treasures with respect to $L$, as required. Hence, $P(n)$ holds. \\
+
+Therefore, by induction we have that $\forall n \in \N, P(n)$ holds. Therefore, Valuable($L$) is correct. \\
+
+Therefore, ValuableTreasure($L$) is correct, as required. 
+\end{proof}
+
+
+
+
+\newpage
+
+\section*{Question 3}
+
+\subsection*{Part a)}
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{ScheduleTwoClassrooms($[s_1, f_1),...,[s_n,f_n)$)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\State Sort and relabel each lecture interval by finish time so that $f_1 \leq f_2 \leq ... \leq f_n$.
+\State Let $l_1 \gets 0$ where $l_1$ is the finish time of the latest lecture scheduled in classroom 1. 
+\State Let $l_2 \gets 0$ where $l_2$ is the finish time of the latest lecture scheduled in classroom 2.
+\State Let $A_1 \gets \{\}$
+\State Let $A_2 \gets \{\}$
+\For{i = 1 to $n$}
+    \State Check if $i$ is compatible with classroom 1 by checking if $s_i \geq l_1$  
+    \State Check if $i$ is compatible with classroom 2 by checking if $s_i \geq l_2$
+    \State Among the compatible classrooms above, find $j \in \{1,2\}$ such that $l_j$ is maximum. 
+    \State Add $i$ to $A_j$
+    \State $l_j \rightarrow f_i$
+\EndFor
+\State \textbf{Return} $(A_1,A_2)$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Part b)}
+
+We will analyze the worst-case running time of ScheduleTwoClassrooms. Consider an input $[s_1, f_1),...,[s_n,f_n)$ with $n$ lectures. \\
+
+Line 1 takes $\mathcal{O}(n\log n)$ time using a mergesort sorting algorithm. Lines 2-5 take $\mathcal{O}(1)$ time. The for loop has $n$ iterations, and the body of the for loop takes $\mathcal{O}(1)$ time. Hence, the entire for loop on lines 6-12 take $\mathcal{O}(n)$ time. \\
+
+Hence, ScheduleTwoClassrooms runs in $\mathcal{O}(n\log n)$ time. 
+
+\subsection*{Part c)}
+
+Consider the following definitions. \\
+
+Let $S_0 = (\emptyset, \emptyset)$. \\
+
+Let $S_j = (A_{j_1}, A_{j_2})$ be the partial schedule picked by our greedy algorithm from the first $j$ jobs where $A_{j_1}, A_{j_2} \subseteq \{1,...,j\}$ are what is scheduled in classrooms 1 and 2 respectively and $A_{j_1} \cap A_{j_2} = \emptyset$. \\
+
+A partial solution $S_j$ is promising if there is a way to extend it to an optimal solution $O_j = (O_{j_1}, O_{j_2})$ where $O_{j_1}, O_{j_2}$ are what is scheduled in classrooms 1 and 2 respectively and $A_{j_1} \subseteq O_{j_1}$ and $A_{j_2} \subseteq O_{j_2}$ and $O_{j_1} \cap O_{j_2} = \emptyset$. \\
+
+From hereafter, we will only refer to $S_j$ and $O_j$ for each $j$ without explicitly referring to $A_{j_1}, A_{j_2}, O_{j_1}, O_{j_2}$ to avoid cumbersome notation and for readability. \\
+
+\textbf{Want to Show:} $S_j$ is promising for all $j \in \{0,1,...,n\}$. \\
+
+\textbf{Base Case:} For $j = 0$, we have $S_0 = (\emptyset, \emptyset)$. Any optimal solution extends $S_0$. Hence, $S_0$ is promising. \\
+
+\textbf{Inductive Hypothesis:} Assume $S_j$ is promising where $0 \leq j < n$. \\
+
+\textbf{Want to Show:} $S_{j+1}$ is promising. \\
+
+By inductive hypothesis, since $S_j$ is promising, we know there exists some optimal solution $O_j$ extending $S_j$. \\
+
+Now consider lecture $j + 1$. We have the following cases. \\
+
+\textbf{Case 1:} Our greedy algorithm does not schedule $j+1$. Hence, $S_{j+1} = S_j$. Hence, lecture $j+1$ conflicts with some lecture in $S_{j+1} = S_j$ in some classroom. Since $O_j$ extends $S_j$, we have that $j+1$ conflicts with some lecture in $O_j$ in some classroom. So let $O_{j+1} = O_j$. Since $O_{j+1} = O_j$ is optimal and extends $S_{j+1} = S_j$, we have that $O_{j+1}$ is optimal and extends $S_{j+1}$. Hence, $S_{j+1}$ is promising. \\
+
+\textbf{Case 2:} Our greedy algorithm schedules $j+1$ in classroom 1 in $S_{j+1}$. Consider the following sub-cases. \\
+
+\textbf{Subcase 2 i)} The optimal solution $O_j$ also schedules $j+1$ in classroom 1. \\
+
+So let $O_{j+1} = O_j$. Clearly $O_{j+1}$ extends $S_{j+1}$ and $O_{j+1}$ is optimal since $O_{j+1} = O_j$ where $O_j$ is optimal. Hence, $S_{j+1}$ is promising. \\
+
+\textbf{Subcase 2 ii)} The optimal solution $O_j$ schedules $j+1$ in classroom 2. \\
+
+We know that $S_j$ and $O_j$ have the same schedule up to the $j$-th iteration of our greedy algorithm. Consider $l_1$ and $l_2$ as defined in our greedy algorithm after the $j$-th iteration. \\
+
+Since our greedy algorithm schedules $j+1$ in classroom 1, we have that $s_{j+1} \geq l_1$ since we need compatability, and we have $l_1 \geq l_2$ by our greedy strategy. Hence, $s_{j+1} \geq l_1 \geq l_2$. \\
+
+Now consider a solution $O_{j+1}$ defined as follows. $O_{j+1}$ is the same as $O_j$ except that every lecture scheduled after time $l_1$ in classroom 1 is swapped with every lecture scheduled after time $l_2$ in classroom 2. We know we can make this swap since $j+1$ was scheduled in $O_j$ in classroom 2, and since $s_{j+1} \geq l_1 \geq l_2$, we have that every lecture after $l_2$ in classroom 2 (including $j+1$) can be scheduled after $l_1$ in classroom 1. Similarly, since $l_1 \geq l_2$, every lecture scheduled after $l_1$ in classroom 1 can trivially be scheduled after $l_2$ in classroom 2. Since we simply swapped lectures, we have that $O_{j+1}$ has the same number of lectures scheduled as $O_j$. Hence, $O_{j+1}$ is optimal. Since $O_{j+1}$ schedules $j+1$ in classroom 1, $O_{j+1}$ extends $S_{j+1}$. Hence, $S_{j+1}$ is promising. \\
+
+\textbf{Subcase 2 iii)} The optimal solution $O_j$ does not schedule $j+1$ in either classroom. \\
+
+Since we assumed that our greedy solution schedules $j+1$ in classroom 1, we know that $j+1$ is indeed compatible with $S_j$ when scheduled in classroom 1. And since $O_j$ extends $S_j$, where $j+1$ is not compatible with $O_j$, but is compatible with $S_j$, we must have that $j+1$ is not compatible with some lecture $k \in \{j+2,...,n\}$ for classroom 1. And, $j+1 < k$. \\
+
+Now, assume for the sake of contradiction that there existed two distinct lectures $k_1, k_2 \in \{j+2,...,n\}$ scheduled in classroom 1 in $O_j$ such that $k_1$ and $k_2$ are incompatible with $j+1$ in classroom 1. We know $j+1 < k_1$ and $j+1 < k_2$. Since we ordered our lectures by finish time we know that $f_{j+1} \leq f_{k_1}$ and $f_{j+1} \leq f_{k_2}$. But since $j+1$ is incompatible with both $k_1$ and $k_2$ and since $f_{j+1} \leq f_{k_1}$ and $f_{j+1} \leq f_{k_2}$, we must have that $k_1$ and $k_2$ are incompatible with each other in classroom 1. This contradicts the fact that $k_1$ and $k_2$ are scheduled in $O_j$ which is an optimal solution. Hence, there cannot exist two distinct lectures $k_1$ and $k_2$. \\
+
+Hence, there is only one lecture $k > j+1$ scheduled in classroom 1 in $O_j$ that is incompatible with $j+1$. So let $O_{j+1}$ be the same solution as $O_j$ except that we replace the scheduling of lecture $k$ with the lecture $j+1$ in classroom 1. Since $j+1$ only conflicted with $k$, we know that this swap works. And since $O_{j+1}$ has the same number of scheduled lectures as $O_j$, we have that $O_{j+1}$ is optimal. And since $O_{j+1}$ schedules $j+1$ in classroom 1, we have that $O_{j+1}$ extends $S_{j+1}$. Hence, $S_{j+1}$ is promising. \\
+
+\textbf{Case 3:}  Our greedy algorithm schedules $j+1$ in classroom 2. This Case 3 is symmetric to Case 2 except with the roles of classroom 1 and classroom 2 reversed. \\
+
+In all 3 cases we have that $S_{j+1}$ is promising. \\
+
+Hence, we have shown that $S_j$ is promising for all $j \in \{0,1,...,n\}$. \\
+
+Since $S_n$ is promising, we know that our algorithm does indeed find an optimal solution, as required.  
+
+\newpage
+
+\section*{Question 4}
+
+\subsection*{Part a)}
+
+Consider an ordering by the Earliest Finish Time (EFT) such that we have $f_1 \leq f_2 \leq ... \leq f_n$. We greedily select the next interval with the earliest finish time that makes the schedule contiguous (with possible overlap if necessary). \\
+
+Consider the following counterexample which shows this strategy is not optimal. \\
+
+Consider the three intervals $[0,1), [0,5), [5,10)$. \\
+
+Our greedy strategy will select all 3 intervals above to schedule between time 0 and time 10 since we select based on earliest finish time. \\
+
+However, this solution is not optimal because an optimal solution can be just the two intervals $[0,5), [5,10)$ which covers the entire range in fewer intervals (2 instead of 3). \\
+
+Therefore, this greedy strategy would not work. \\
+
+Please see the next page for parts b), c), d).  
+
+\newpage
+
+\subsection*{Part b)}
+
+Note, we will assume that a set has no duplicates. i.e. If $S = \{5\}$ and we add $5$ to $S$, we would get that $S = \{5\}$. Please keep this in mind when reading the algorithm below. \\
+
+\textbf{Greedy Strategy:} Sort the intervals by Earliest Start Time (EST). If $[s_p, f_p)$ is the most recently scheduled interval, we will greedily select the next interval $[s_q, f_q)$ in our ordering such that $s_q \leq s_p$ and $f_q$ is maximal. \\
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{TASchedule($[s_1, f_1),...,[s_n,f_n)$)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\State Sort and relabel each lecture interval by earliest start time so that $s_1 \leq s_2 \leq ... \leq s_n$. 
+\State $start \gets s_1$
+\State $end \gets start$
+\State $schedule \gets \{\}$ \Comment{A set has no duplicates}
+\State $candidate \gets 1$ \Comment{Initialize $candidate$ to first interval}
+\State
+\For{each $i$ from 1 to $n$}
+    \If{$s_i \leq start$ and $f_i \geq end$}
+        \State $candidate \gets i$
+        \State $end \gets f_i$
+    \Else
+        \State start $\gets end$
+        \State Add $candidate$ to $schedule$ \Comment{A set has no duplicates}
+        \State
+        \If{$end \geq f_n$}
+            \State exit the for loop early.
+        \EndIf
+        \State
+        \If{$s_{i} \leq start$} \Comment{Note, $start$ was updated}
+            \State $candidate \gets i$
+            \State $end \gets f_{i}$
+        \EndIf
+        \State
+    \EndIf
+\EndFor
+\State
+
+\If{$end \geq f_n$}
+    \State \textbf{return $schedule$}
+\Else
+    \State \textbf{return None - No solution exists!}
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Part c)}
+
+We will analyze the runtime of TASchedule. \\
+
+Line 1 takes $\mathcal{O}(n \log n)$ time since we are sorting (i.e. via mergesort). \\
+
+Clearly lines 2-6 take constant time. We have a for loop from lines 7-25 that has at most $n$ iterations. Each iteration takes constant time. So the for loop runs in $\mathcal{O}(n)$ time. \\
+
+Finally lines 26-31 run in constant time. \\
+
+Therefore, TASchedule runs in $\mathcal{O}(n \log n)$ time in the worst case. 
+
+\subsection*{Part d)}
+
+We will prove that our greedy algorithm always produces an optimal solution. 
+
+\begin{proof}
+
+Note, it is possible that an input of intervals $[s_1, f_1),...,[s_n,f_n)$ may not have any solution if there is a gap not covered by any interval. Hence, our greedy algorithm cannot possibly find a solution either. Our greedy algorithm will in fact return \textbf{None} when there is such a gap. \\
+
+Hence, consider an input of intervals $[s_1, f_1),...,[s_n,f_n)$ and assume that there exists a solution. Hence, there exists an optimal solution. \\
+
+Assume for the sake of contradiction that our greedy algorithm does not produce an optimal solution for input $[s_1, f_1),...,[s_n,f_n)$. \\
+
+Let $\{i_1,i_2,...,i_k\} \subseteq \{1,...,n\}$ be the solution given by our greedy algorithm sorted by start time. Note, we simply refer to the interval indices in our solution. \\
+
+Let $\{j_1,j_2,...,j_m\} \subseteq \{1,...,n\}$ be an optimal solution sorted by start time that agrees with our greedy solution for the \textbf{most} indices as possible. i.e. Let $r$ be the largest possible integer such that $i_q = j_q$ for all $q \in \{1,...,r\}$. \\
+
+Note, since we are assuming that our greedy algorithm is not optimal, we have that $m < k$. \\
+
+We know $r \leq m$. Note, if $r = m$, then we would have that the first $r$ intervals selected by our greedy solution would make an optimal solution. But then our greedy algorithm would have terminated after the first $r$ iterations with an optimal solution which would be a contradiction. Hence, we must have $r < m$. \\
+
+So we have that $r < m < k$. \\
+
+Consider $r + 1$ where $r + 1 \leq m < k$. We have that $i_{r+1} \neq j_{r+1}$ by definition of $r$. \\
+
+And since our schedules are contiguous without gaps, we know that $s_{i_{r+1}} \leq s_{i_r}$ and $s_{j_{r+1}} \leq s_{j_r}$. \\
+
+Since $i_r = j_r$, we know that $[s_{i_r}, f_{i_r}) = [s_{j_r}, f_{j_r})$. Hence, $s_{i_r} = s_{j_r}$. \\
+
+Since $s_{i_{r+1}} \leq s_{i_r}$ and $s_{i_r} = s_{j_r}$, we have that $s_{i_{r+1}} \leq  s_{j_r}$. \\
+
+Recall our greedy strategy. If $[s_p, f_p)$ is the most recently scheduled interval, then we greedily select the next interval $[s_q, f_q)$ in our earliest start time ordering such that $s_q \leq s_p$ and $f_q$ is maximal. \\
+
+Hence, by our greedy strategy and maximality, we must have that $f_{i_{r+1}} \geq f_{j_{r+1}}$. \\
+
+Notice that we now have $s_{i_{r+1}} \leq  s_{j_r}$ and $f_{i_{r+1}} \geq f_{j_{r+1}}$. Hence, in our optimal solution we can replace the interval with index $j_{r+1}$ with the interval with index $i_{r+1}$ and still have an optimal solution. The solution remains optimal after this swap since the number of intervals in our optimal schedule has not changed (we only made 1 swap), and our schedule remains contiguous since $s_{i_{r+1}} \leq  s_{j_r}$ and $f_{i_{r+1}} \geq f_{j_{r+1}}$. \\
+
+But now our modified optimal solution agrees with our greedy solution for $r+1$ many intervals. \\
+
+This is a contradiction. Therefore, our greedy algorithm is optimal, as required. 
+\end{proof}
+
+\newpage
+
+\section*{Question 5}
+
+\textbf{Citations/Sources:} Our main idea is inspired from the famous Egg Drop Puzzle. The Egg Drop Puzzle is a well-known interview question given by Microsoft. We will use the Egg Drop algorithm as a sub-routine. Given $n$ floors and $k$ eggs, the egg drop algorithm determines the minimal number of floors needed to be checked to find the highest floor we can drop an egg without breaking. It is similar to the voltage optimization problem, except the egg drop problem finds a minimal number of floors, and not the floor itself. We will use a version of the egg drop algorithm in our subroutine \textbf{FewestTests}. \\
+
+The Egg Drop problem and Brilliant article. \\
+
+\textbf{Source:} \url{https://brilliant.org/wiki/egg-dropping/} \\
+
+Consider the following algorithm. Assume $A$ is our array of $n$ non-increasing bulb voltages, and $k$ is the number of bulbs we are willing to waste. Assume $A$ is nonempty, and $k \geq 1$. \\
+
+Note, if every bulb in the array $A$ can withstand 120V, we will return $len(A)$. If no bulb in $A$ can withstand 120V, we will return 0. 
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{MaxVoltage(A, k)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\State return $MaxIndex(A,k,1,len(A))$ \Comment{Note, 1-based indexing}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{MaxIndex(A, k, low, high)}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\If{$k = 1$} \Comment{1 bulb willing to break; do linear search}
+    \For{each $i$ from $low$ to $high$}
+        \If{$A[i] < 120$}
+            \State \textbf{return} $i - 1$ 
+        \EndIf
+    \EndFor
+    \State \textbf{return $high$} 
+\EndIf
+\State
+\State $n \gets high - low + 1$
+\State $index \gets FewestTests(n,k)$ \Comment{See next page for $FewestTests$}
+\If{$A[index] < 120$}
+    \State \textbf{return} $MaxIndex(len(A[low,...,index-1]), k-1)$   \Comment{if breaks}
+\Else
+    \State \textbf{return} $MaxIndex(len(A[index+1,...,high]), k)$  \Comment{if intact}
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+\newpage
+
+\begin{algorithm}[hbt!]
+\caption{\textbf{FewestTests(n,k)} \Comment{This is the Microsoft "Egg Drop" Algorithm; see citations.}}\label{alg:cap}
+\input{}
+\begin{algorithmic}[1]
+\If{$n = 1$} \Comment{$n$ is number of bulbs}
+    \State \textbf{return} 1 \Comment{1 test for 1 bulb total}
+\EndIf
+\If{$k = 1$} \Comment{$k$ is number of bulbs willing to break}
+    \State \textbf{return} $n$ \Comment{$n$ tests for 1 bulb to break}
+\EndIf
+\State
+\State $m = + \infty$
+\For{each $i$ from 1 to $n$}
+    \State $breaks \gets FewestTests(i-1, k-1)$ \Comment{Consider bulbs before $i$ if breaks}
+    \State $intact \gets FewestTests(n-i, k)$\Comment{Consider bulbs after $i$ if intact}
+    \State $temp = max(breaks, intact)$
+    \State $m = min(m, temp)$ 
+\EndFor
+\State \textbf{return} $m+1$
+\end{algorithmic}
+\end{algorithm}
+Note the above subroutine FewestTests can be faster if we used dynamic programming and memoization. However, in this question we are only concerned with the number of bulbs we are testing in MaxIndex, and hence we do not care about the runtime of FewestTests. Hence, we will not use dynamic programming and memoization here. 
+
+
+
+\end{document}

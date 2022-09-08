@@ -1,0 +1,319 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{caption}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+
+
+\captionsetup[algorithm]{labelformat=empty}
+
+\begin{document}
+
+\setlength\parindent{0pt}
+
+
+\section*{Question 1}
+
+\subsection*{Part a)}
+
+\textbf{Required:} Show how to solve the maximum flow with losses problem using linear programming. Give a detailed description of your linear program and justify clearly and carefully that it solves the problem. \\
+
+Let $c: E \rightarrow \R^{\geq 0}$ be the capacity function. \\
+
+Let $f_{uv}$ be a variable intended to represent the flow on edge $(u,v) \in E$. Consider the following linear program which we will call $L$. 
+
+\begin{center}
+\begin{tabular}{ l c p{1pt} c c}
+Maximize    & \multicolumn{3}{l}{$\sum\limits_{(s,v) \in E}f_{sv}$} \\ \\
+Subject to  & $f_{uv}$ & $\leq$ & $c(u,v)$ &\text{for all $(u,v) \in E$} \\ \\
+            & $\sum\limits_{(u,v) \in E} f_{uv}$ & $=$ &
+            $(1-\epsilon_u)\sum\limits_{(v,u) \in E} f_{vu}$ &\text{for all  $u \in V \setminus \{s,t\}$} \\ \\
+            & $f_{uv}$  & $\geq$ & $0$ &\text{for all $(u,v) \in E$} \\ \\
+\end{tabular}
+\end{center}
+
+
+\textbf{Justification of correctness of $L$:} \\
+
+Let $OPT$ be the maximum flow value corresponding to any max flow function. Let $OBJ$ be the optimal objective value of $L$. \\
+
+\textbf{Want to Show:} $OPT = OBJ$ \\
+
+We will show that $OPT \leq OBJ$ and $OPT \geq OBJ$. \\
+
+\textbf{Show:} $OPT \leq OBJ$ \\
+
+Let $f$ be any flow function such that $v(f) = OPT$. For each variable $f_{uv}$ where $(u,v) \in E$, let $f_{uv} = f(u,v)$. We know that the following three facts hold since $f$ is a valid flow with losses. The first fact is our capacity constraints, the second fact is flow conservation with losses, and the third fact is our non-negative flow requirements.  \\
+
+1. $f(u,v) \leq c(u,v)$ for all $(u,v) \in E$. \\
+
+2. $\sum\limits_{(u,v) \in E} f(u,v) = (1-\epsilon_u)\sum\limits_{(v,u) \in E} f(v,u)$ for all  $u \in V \setminus \{s,t\}$ \\
+
+3. $f(u,v) \geq 0$ for all $(u,v) \in E$ \\
+
+But since we assigned $f_{uv} = f(u,v)$ for all $(u,v) \in E$, we know that the following holds. \\
+
+1. $f_{uv} \leq c(u,v)$ for all $(u,v) \in E$. \\
+
+2. $\sum\limits_{(u,v) \in E} f_{uv} = (1-\epsilon_u)\sum\limits_{(v,u) \in E} f_{vu}$ for all  $u \in V \setminus \{s,t\}$ \\
+
+3. $f_{uv} \geq 0$ for all $(u,v) \in E$ \\
+
+Hence, all our constraints of $L$ are satisfied. And $\sum\limits_{(s,v) \in E}f_{sv} = \sum\limits_{(s,v) \in E}f(s,v) = v(f) = OPT$. So we have a feasible solution with objective value equal to $OPT$. \\
+
+Since our optimal objective value is the maximum objective value across all feasible solutions, we have that $OPT \leq OBJ$. \\
+
+\textbf{Show:} $OPT \geq OBJ$ \\
+
+Consider an optimal feasible solution to $L$ with objective value $OBJ$. Consider the values to each variable $f_{uv}$ where $(u,v) \in E$. We know that the following holds from our constraints. \\
+
+1. $f_{uv} \leq c(u,v)$ for all $(u,v) \in E$. \\
+
+2. $\sum\limits_{(u,v) \in E} f_{uv} = (1-\epsilon_u)\sum\limits_{(v,u) \in E} f_{vu}$ for all  $u \in V \setminus \{s,t\}$ \\
+
+3. $f_{uv} \geq 0$ for all $(u,v) \in E$ \\
+
+Now, consider the function $f: E \rightarrow \R^{\geq 0}$ defined by $f(u,v) = f_{uv}$. Hence, the following facts hold. \\
+
+1. $f(u,v) \leq c(u,v)$ for all $(u,v) \in E$. \\
+
+2. $\sum\limits_{(u,v) \in E} f(u,v) = (1-\epsilon_u)\sum\limits_{(v,u) \in E} f(v,u)$ for all  $u \in V \setminus \{s,t\}$ \\
+
+3. $f(u,v) \geq 0$ for all $(u,v) \in E$ \\
+
+These facts show $f$ is a valid flow with losses. And $v(f) = \sum\limits_{(s,v) \in E}f(s,v) = \sum\limits_{(s,v) \in E}f_{sv} = OBJ$. \\
+
+Since $OPT$ is the maximum flow value, we have that $OPT \geq v(f) = OBJ$. i.e. $OPT \geq OBJ$. \\
+
+Since $OPT \leq OBJ$ and $OPT \geq OBJ$, we have that $OPT = OBJ$. Hence, $L$ is correct, as required. \\
+
+Please see the next page. 
+
+\newpage
+
+\subsection*{Part b)}
+
+First we will rewrite $L$ so that the RHS are all constants, the variables are all on the LHS, and we will change equalities to inequalities. 
+
+\begin{center}
+\begin{tabular}{ l c p{1pt} c c}
+Maximize    & \multicolumn{3}{l}{$\sum\limits_{(s,v) \in E}f_{sv}$} \\ \\
+Subject to  & $f_{uv}$ & $\leq$ & $c(u,v)$ &\text{for all $(u,v) \in E$} \\ \\
+            & $\sum\limits_{(u,v) \in E} f_{uv}$ - $(1-\epsilon_u)\sum\limits_{(v,u) \in E} f_{vu}$ & $\leq$ &
+            0 &\text{for all $u \in V \setminus \{s,t\}$} \\ \\
+            & $(1-\epsilon_u)\sum\limits_{(v,u) \in E} f_{vu}$ - $\sum\limits_{(u,v) \in E} f_{uv}$& $\leq$ &
+            0 &\text{for all  $u \in V \setminus \{s,t\}$} \\ \\
+            & $f_{uv}$  & $\geq$ & $0$ &\text{for all $(u,v) \in E$} \\ \\
+\end{tabular}
+\end{center}
+
+Fix an enumeration of the set $E$ which is finite. i.e. Assume we can write $E = \{e_1,e_2,...,e_n\}$, where each $e_i = (u,v)$ for some $u,v \in V$. \\
+
+Also fix an enumeration of $V \setminus \{s,t\}$ so that $V \setminus \{s,t\} = \{v_1,v_2,...,v_k\}$. \\
+
+Let $x_i = f_{e_i}$ for $i \in \{1,...,n\}$. i.e. We just renamed our original variables. \\
+
+Let $x = \begin{bmatrix} x_1 \\ x_2 \\ \cdot \cdot \cdot \\ x_n \end{bmatrix}$ be an $n \times 1$ matrix of variables. Note, $n = |E|$. \\
+
+Let $c = \begin{bmatrix} c_1 \\ c_2 \\ \cdot \cdot \cdot \\ c_n \end{bmatrix}$ be an $n \times 1$ matrix where each entry $c_i$ is such that $c_i = 1$ if $e_i = (s,v)$ for some $v \in V$, and $c_i = 0$ otherwise. \\
+
+We will define our matrix $A$ and our vector $b$. But first we will define $m$. Since $m$ represents the number of constraints, we know that we must count the number of constraints of $L$. \\
+
+Looking at $f_{uv} \leq c(u,v)$ for all $(u,v) \in E$, we know that there are exactly $|E|$ such constraints. \\
+
+Similarly, for the second and third class of constraints of $L$, we have exactly $|V \setminus \{s,t\}|$ many constraints each. \\
+
+Summing up, let $m = |E| + 2 \cdot |V \setminus \{s,t\}| = n + 2k$. \\
+
+Let $b = \begin{bmatrix} b_1 \\ b_2 \\ \cdot \cdot \cdot \\ b_m \end{bmatrix}$ be an $m \times 1$ vector defined as follows. For the first $|E|$ rows of $b$, let $b_i = c(e_i)$, where $i \in \{1,...,|E|\}$ and $c$ is the capacity function. Let every other entry of $b$ equal 0. This exactly corresponds to the RHS of each constraint of $L$. \\
+
+Finally, we define $A$ to be an $m \times n$ matrix as follows. Note, since $m = n + 2k$, we know $m > n$. \\
+
+The first $|E|$ many rows of $A$ will be such that the $i$-th row, where $i \in \{1,...,|E|\}$ will contain all 0s except with a 1 at the $i$-th entry of that row. These first $|E|$ rows correspond to the first class of constraints (the capacity constraints) of $L$. \\
+
+The next $|V \setminus \{s,t\}|$ many rows of $A$ will represent the second class of constraints. These rows will come immediately after the rows representing the first class of constraints described earlier. We will have a new row corresponding to each $v_i \in V \setminus \{s,t\} = \{v_1,v_2,...,v_k\}$. The next $i$-th such row in this class of constraints corresponding to $v_i$ will be defined as follows. The next $i$-th such row is a $1 \times n$ vector. Call this row $r_i$. For each $j \in \{1,...,n\}$, let the $j$-th entry of $r_i$ be equal to 1 if $e_j = (v_i, v)$ for some $v \in V$, or equal to $-(1-\epsilon_{v_i})$ if $e_j = (v, v_i)$ for some $v \in V$, or equal to 0 otherwise. \\
+
+The next $|V \setminus \{s,t\}|$ many rows of $A$ will represent the third class of constraints. These rows will come immediately after the rows representing the second class of constraints described earlier. We will have a new row corresponding to each $v_i \in V \setminus \{s,t\} = \{v_1,v_2,...,v_k\}$. The next $i$-th such row in this class of constraints corresponding to $v_i$ will be defined as follows. The next $i$-th such row is a $1 \times n$ vector. Call this row $r_i$. For each $j \in \{1,...,n\}$, let the $j$-th entry of $r_i$ be equal to $(1-\epsilon_{v_i})$ if $e_j = (v, v_i)$ for some $v \in V$, or equal to $-1$ if $e_j = (v_i, v)$ for some $v \in V$, or equal to 0 otherwise. \\
+
+This completely describes our $m \times n$ matrix $A$. \\
+
+Now we have completely defined our vectors and matrices $x, c, A, b$. We can now rewrite $L$ using these matrices and vectors. i.e. 
+
+\begin{center}
+\begin{tabular}{ l c p{1pt} c }
+Maximize    & \multicolumn{3}{l}{$c^Tx$} \\
+Subject to  & $Ax$ & $\hspace{-3mm} \leq$ & $b$ \\
+            & $x \geq 0$
+\end{tabular}
+\end{center}
+Since all we have done was change equalities to inequalities in $L$, and rewrote $L$ using matrix-vector notation, we know that this new representation of $L$ is still fundamentally the same linear program. Hence, a solution to this matrix-vector representation of $L$ is still a solution to our original $L$. And from part a), we know that our original $L$ solves the max flow problem with losses, as required. 
+
+\newpage
+
+\section*{Question 2}
+
+Consider the following BILP (Binary Integer Linear Program). For $i \in \{1,...,n\}$, let $x_i$ be a binary variable representing a purchase of tool $i$. i.e. $x_i = 1$ if we purchase tool $i$, and $x_i = 0$ otherwise.
+
+\begin{center}
+\begin{tabular}{ l c p{1pt} c }
+Minimize    & \multicolumn{3}{l}{$\sum\limits_{i=1}^n x_ic_i + \sum\limits_{i=1}^m \sum\limits_{j=1}^n (1-x_j)d_{i,j}$} \\ \\
+
+Subject to  & $x_i + \sum_{\text{$j$: tool $j$ incompatible with $i$}} x_j$ & $\leq$ & $1$ for all $i \in \{1,...,n\}$\\ \\
+
+            & $x_i \in \{0,1\}$ for all $i \in \{1,...,n\}$
+            
+\end{tabular}
+\end{center}
+
+Let's denote our BILP by $L$. \\
+
+\textbf{Justification of correctness of $L$:} \\
+
+Let $OPT$ be the minimum cost from any valid purchasing of tools. Let $OBJ$ be the optimal objective value of $L$. \\
+
+\textbf{Want to Show:} $OPT = OBJ$. \\
+
+We will show that $OBJ \leq OPT$ and $OPT \leq OBJ$ . \\
+
+\textbf{Show: $OBJ \leq OPT$} \\
+
+Consider any valid purchasing of tools with total cost equal to $OPT$. Let $x_i = 1$ if we purchase tool $i$, and let $x_i = 0$ otherwise. We will show that this is a feasible solution to $L$. \\
+
+We know that tools that are incompatible are not purchased together. Hence, we must have purchased at most 1 tool amongst tool $i$ and all the other tools that are incompatible with tool $i$, for each $i \in \{1,...,n\}$. Hence, we must have that $x_i + \sum_{\text{$j$: tool $j$ incompatible with $i$}} x_j \leq 1$ for each $i \in \{1,...,n\}$. So the first constraint is satisfied. \\
+
+And trivially we have that $x_i \in \{0,1\}$ since either $x_i = 0$ or $x_i = 1$ for all $i \in \{1,...,n\}$. \\
+
+Our cost of tools is $\sum\limits_{i=1}^n x_ic_i$ (where each $x_i$ is an indicator variable for tool $i$). And our cost of our dependencies is $\sum\limits_{i=1}^m \sum\limits_{j=1}^n (1-x_j)d_{i,j}$, where we don't have any dependency cost for $d_{i,j}$ if $x_j = 1$. Hence, the total cost is $OPT = \sum\limits_{i=1}^n x_ic_i + \sum\limits_{i=1}^m \sum\limits_{j=1}^n (1-x_j)d_{i,j}$. \\
+
+Hence, we have a feasible solution with objective value equal to $OPT$. \\
+
+Since $L$ minimizes objective values across all feasible solutions, we have that $OBJ \leq OPT$. \\
+
+\textbf{Show: $OPT \leq OBJ$} \\
+
+Consider an optimal feasible solution to $L$ with objective value equal to $OBJ$. \\
+
+We will show that this solution corresponds to a valid purchasing of tools. \\
+
+Purchase tool $i$ if $x_i = 1$, and do not purchase tool $i$ if $x_i = 0$. \\
+
+From constraint 1, we know that for each tool $i$, we have $x_i + \sum_{\text{$j$: tool $j$ incompatible with $i$}} x_j \leq 1$. Hence, for each tool $i$, we know we have purchased at most 1 tool amongst tool $i$ and all the other tools that are incompatible with tool $i$. \\
+
+Hence, our choice of tools is indeed a valid purchasing. Our cost of tools is $\sum\limits_{i=1}^n x_ic_i$ (where each $x_i$ is an indicator variable for tool $i$). And the cost of our dependencies is $\sum\limits_{i=1}^m \sum\limits_{j=1}^n (1-x_j)d_{i,j}$, where we don't have any dependency cost for $d_{i,j}$ if $x_j = 1$. Hence, the total cost is $OBJ = \sum\limits_{i=1}^n x_ic_i + \sum\limits_{i=1}^m \sum\limits_{j=1}^n (1-x_j)d_{i,j}$. \\
+
+Hence, we have a valid purchasing of tools whose total cost equals $OBJ$. \\
+
+Since $OPT$ is the minimum cost from any valid purchasing of tools, we have that $OPT \leq OBJ$. \\
+
+Since $OBJ \leq OPT$ and $OPT \leq OBJ$, we conclude that $OPT = OBJ$. Therefore, our BILP $L$ is correct, as required. 
+
+
+
+
+
+
+
+\newpage
+
+\section*{Question 3}
+
+\subsection*{Part a)}
+
+The vertices of the feasible region of $L$ in the form $(x_1, x_2)$ are $(0,0), (0,1.6), (\frac{9}{11}, \frac{23}{11}), (1.7142857, 0)$. Note, we have that $1.7142857$ is rounded as it was determined from a graphing program (as the hint suggested). 
+
+\subsection*{Part b)}
+
+The optimal solution of $L$ is $(x_1,x_2) = (\frac{9}{11}, \frac{23}{11}) \approx (0.8182, 2.0909)$. \\
+
+The optimal solutions of $I$ are $(x_1,x_2) = (1,1)$ and $(x_1, x_2) = (0,1)$. \\
+
+The optimal objective value corresponding to $L$ is $x_2 = \frac{23}{11} \approx 2.0909$. \\
+
+The optimal objective value corresponding to $I$ is $x_2 = 1$. 
+
+\subsection*{Part c)}
+
+We will restate $L$ below. 
+
+\begin{center}
+\begin{tabular}{ l c p{1pt} c }
+Maximize    & \multicolumn{3}{l}{$x_2$} \\
+Subject to  & $-3x_1 + 5x_2$ & $\leq$ & $8$ \\
+            & $7x_1 + 3x_2$  & $\leq$ & $12$ \\
+            & $x_1, x_2 \geq 0$
+\end{tabular}
+\end{center}
+Let $c = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$, $x = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$, $b = \begin{bmatrix} 8 \\ 12 \end{bmatrix}$ and $A = \begin{bmatrix} -3 & 5 \\ 7 & 3 \end{bmatrix}$. Hence, in matrix notation, we can write $L$ as follows.
+
+\begin{center}
+\begin{tabular}{ l c p{1pt} c }
+Maximize    & \multicolumn{3}{l}{$c^Tx$} \\
+Subject to  & $Ax$ & $\hspace{-3mm} \leq$ & $b$ \\
+            & $x \geq 0$
+\end{tabular}
+\end{center}
+
+
+We have 2 constraints and 2 variables. Hence, our dual will also have 2 constraints and 2 variables. \\
+
+Let $y = \begin{bmatrix} y_1 \\ y_2 \end{bmatrix}$, where $y_1$ is the dual variable corresponding to the constraint $-3x_1 + 5x_2 \leq 8$ and $y_2$ is the dual variable corresponding to the constraint $7x_1 + 3x_2 \leq 12$. \\
+
+As from lecture, we know that the dual $L^\prime$ is of the following form. 
+
+\begin{center}
+\begin{tabular}{ l c p{1pt} c }
+Minimize    & \multicolumn{3}{l}{$y^Tb$} \\
+Subject to  & $y^TA$ & $\hspace{-3mm} \geq$ & $c^T$ \\
+            & $y \geq 0$
+\end{tabular}
+\end{center}
+We will now rewrite $L^\prime$ without using matrix notation. Please see the next page. 
+
+\newpage
+
+Rewriting $L^\prime$ without matrix notation we get,
+
+\begin{center}
+\begin{tabular}{ l c p{1pt} c }
+Minimize    & \multicolumn{3}{l}{$8y_1 + 12y_2$} \\
+Subject to  & $-3y_1 + 7y_2$ & $\geq$ & $0$ \\
+            & $5y_1 + 3y_2$  & $\geq$ & $1$ \\
+            & $y_1, y_2 \geq 0$
+\end{tabular}
+\end{center}
+
+And as we mentioned before, we have that $y = \begin{bmatrix} y_1 \\ y_2 \end{bmatrix}$, where $y_1$ is the dual variable corresponding to the constraint $-3x_1 + 5x_2 \leq 8$ and $y_2$ is the dual variable corresponding to the constraint $7x_1 + 3x_2 \leq 12$. \\
+
+\subsection*{Part d)}
+
+The optimal solution of $L^\prime$ is $(y_1, y_2) = (\frac{7}{44}, \frac{3}{44}) \approx (0.1591, 0.0682)$. \\
+
+The optimal objective value corresponding to $L^\prime$ is $8y_1 + 12y_2 = \frac{23}{11} \approx 2.0909$. \\
+
+The optimal solution of $I^\prime$ is $(y_1, y_2) = (0,1)$. \\
+
+The optimal objective value corresponding to $I^\prime$ is $8y_1 + 12y_2 = 12$. \\
+
+
+\textbf{Question: Does strong duality hold for $I$ and $I^\prime$?} \\
+
+No, we have that the optimal objective value corresponding to $I$ is $1$, whereas the optimal objective value corresponding to $I^\prime$ is 12. Since $1 \neq 12$, we have that strong duality does not hold for $I$ and $I^\prime$. 
+
+
+
+\end{document}
